@@ -6,7 +6,7 @@ name: Azure App Service - myapp-jonguz-xyz-webapp(staging), Build and deploy Dot
 on:
   push:
     branches:
-      - main
+      - feat/*
 
 jobs:
   build-and-deploy:

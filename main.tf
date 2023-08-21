@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~>3.7"
     }
-    azapi = {
-      source  = "Azure/azapi"
-      version = "~>1.8"
-    }
   }
 }
 
@@ -17,35 +13,6 @@ provider "azurerm" {
   features {
 
   }
-}
-
-provider "azapi" {
-}
-
-resource "azapi_resource" "scm-policy" {
-  type      = "Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-03-01"
-  name      = "scm"
-  parent_id = azurerm_linux_web_app.webapp.id
-  body = jsonencode({
-    properties = {
-      allow = true
-    }
-    kind = "string"
-  })
-  depends_on = [azurerm_linux_web_app.webapp]
-}
-
-resource "azapi_resource" "ftp-policy" {
-  type      = "Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-03-01"
-  name      = "ftp"
-  parent_id = azurerm_linux_web_app.webapp.id
-  body = jsonencode({
-    properties = {
-      allow = true
-    }
-    kind = "string"
-  })
-  depends_on = [azurerm_linux_web_app.webapp]
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -71,6 +38,33 @@ resource "azurerm_linux_web_app" "webapp" {
     application_stack {
       dotnet_version = "6.0"
     }
+  }
+
+  provisioner "local-exec" {
+    command = "az resource update --resource-group ${self.resource_group_name} --name ftp --namespace Microsoft.Web --resource-type basicPublishingCredentialsPolicies --parent sites/${self.name} --set properties.allow=true"
+  }
+
+  provisioner "local-exec" {
+    command = "az resource update --resource-group ${self.resource_group_name} --name scm --namespace Microsoft.Web --resource-type basicPublishingCredentialsPolicies --parent sites/${self.name} --set properties.allow=true"
+  }
+}
+
+resource "azurerm_linux_web_app_slot" "webapp-staging" {
+  name           = "staging"
+  app_service_id = azurerm_linux_web_app.webapp.id
+
+  site_config {
+    application_stack {
+      dotnet_version = "6.0"
+    }
+  }
+
+  provisioner "local-exec" {
+    command = "az resource update --resource-group ${azurerm_linux_web_app.webapp.resource_group_name} --name ftp --namespace Microsoft.Web --resource-type basicPublishingCredentialsPolicies --parent sites/${azurerm_linux_web_app.webapp.name}/slots/${self.name} --set properties.allow=true"
+  }
+
+  provisioner "local-exec" {
+    command = "az resource update --resource-group ${azurerm_linux_web_app.webapp.resource_group_name} --name scm --namespace Microsoft.Web --resource-type basicPublishingCredentialsPolicies --parent sites/${azurerm_linux_web_app.webapp.name}/slots/${self.name} --set properties.allow=true"
   }
 }
 
@@ -120,8 +114,21 @@ resource "azurerm_app_service_certificate_binding" "cert-binding" {
   ssl_state           = "SniEnabled"
 }
 
-resource "azurerm_app_service_source_control" "example" {
+resource "azurerm_app_service_source_control" "github" {
   app_id   = azurerm_linux_web_app.webapp.id
+  repo_url = "https://github.com/jogule/myapp"
+  branch   = "main"
+
+  github_action_configuration {
+    code_configuration {
+      runtime_stack   = "dotnetcore"
+      runtime_version = "6.0"
+    }
+  }
+}
+
+resource "azurerm_app_service_source_control_slot" "github-staging" {
+  slot_id  = azurerm_linux_web_app_slot.webapp-staging.id
   repo_url = "https://github.com/jogule/myapp"
   branch   = "main"
 
