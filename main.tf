@@ -36,10 +36,6 @@ resource "azurerm_linux_web_app" "webapp" {
 
   site_config {
   }
-
-  app_settings = {
-    "WEBSITE_WEBDEPLOY_USE_SCM" = "true"
-  }
 }
 
 data "azurerm_dns_zone" "zone" {
