@@ -144,3 +144,14 @@ import {
   to = azapi_resource.ftp-policy
 }
 **/
+
+check "health_check" {
+  data "http" "myapp-check" {
+    url = "https://${trim(azurerm_dns_cname_record.cname-record.fqdn, ".")}"
+  }
+
+  assert {
+    condition     = data.http.myapp-check.status_code == 200
+    error_message = "${data.http.myapp-check.url} returned an unhealthy status code"
+  }
+}
