@@ -2,9 +2,9 @@ terraform fmt
 terraform validate
 terraform apply -auto-approve
 
-git mv main_myapp-jonguz-xyz-webapp.yml PRD.yml
-git mv main_myapp-jonguz-xyz-webapp(qa).yml QAS.yml
-git mv main_myapp-jonguz-xyz-webapp(staging).yml STG.yml
+git mv "main_myapp-jonguz-xyz-webapp.yml" PRD.yml
+git mv "main_myapp-jonguz-xyz-webapp(qa).yml" QAS.yml
+git mv "main_myapp-jonguz-xyz-webapp(staging).yml" STG.yml
 
 gh workflow list -R https://github.com/jogule/myapp -a
 #Azure App Service - myapp-jonguz-xyz-webapp(qa), Build and deploy DotnetCore app          active             66903386
@@ -13,7 +13,7 @@ gh workflow list -R https://github.com/jogule/myapp -a
 
 #edit PRD.yml
 #name: PRD
-#gh workflow disable 66800094 -R https://github.com/jogule/myapp
+gh workflow disable "myapp-jonguz-xyz-webapp(Production)" -R https://github.com/jogule/myapp
 
 #edit STG.yml
 #name: STG
