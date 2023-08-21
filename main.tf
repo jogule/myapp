@@ -68,6 +68,25 @@ resource "azurerm_linux_web_app_slot" "webapp-staging" {
   }
 }
 
+resource "azurerm_linux_web_app_slot" "webapp-qa" {
+  name           = "qa"
+  app_service_id = azurerm_linux_web_app.webapp.id
+
+  site_config {
+    application_stack {
+      dotnet_version = "6.0"
+    }
+  }
+
+  provisioner "local-exec" {
+    command = "az resource update --resource-group ${azurerm_linux_web_app.webapp.resource_group_name} --name ftp --namespace Microsoft.Web --resource-type basicPublishingCredentialsPolicies --parent sites/${azurerm_linux_web_app.webapp.name}/slots/${self.name} --set properties.allow=true"
+  }
+
+  provisioner "local-exec" {
+    command = "az resource update --resource-group ${azurerm_linux_web_app.webapp.resource_group_name} --name scm --namespace Microsoft.Web --resource-type basicPublishingCredentialsPolicies --parent sites/${azurerm_linux_web_app.webapp.name}/slots/${self.name} --set properties.allow=true"
+  }
+}
+
 data "azurerm_dns_zone" "zone" {
   name                = "jonguz.xyz"
   resource_group_name = "platform-connectivity-rg-eastus"
@@ -129,6 +148,19 @@ resource "azurerm_app_service_source_control" "github" {
 
 resource "azurerm_app_service_source_control_slot" "github-staging" {
   slot_id  = azurerm_linux_web_app_slot.webapp-staging.id
+  repo_url = "https://github.com/jogule/myapp"
+  branch   = "main"
+
+  github_action_configuration {
+    code_configuration {
+      runtime_stack   = "dotnetcore"
+      runtime_version = "6.0"
+    }
+  }
+}
+
+resource "azurerm_app_service_source_control_slot" "github-qa" {
+  slot_id  = azurerm_linux_web_app_slot.webapp-qa.id
   repo_url = "https://github.com/jogule/myapp"
   branch   = "main"
 
