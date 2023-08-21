@@ -133,19 +133,6 @@ resource "azurerm_app_service_certificate_binding" "cert-binding" {
   ssl_state           = "SniEnabled"
 }
 
-resource "azurerm_app_service_source_control" "github" {
-  app_id   = azurerm_linux_web_app.webapp.id
-  repo_url = "https://github.com/jogule/myapp"
-  branch   = "main"
-
-  github_action_configuration {
-    code_configuration {
-      runtime_stack   = "dotnetcore"
-      runtime_version = "6.0"
-    }
-  }
-}
-
 resource "azurerm_app_service_source_control_slot" "github-staging" {
   slot_id  = azurerm_linux_web_app_slot.webapp-staging.id
   repo_url = "https://github.com/jogule/myapp"
