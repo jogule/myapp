@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~>3.7"
     }
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~>1.8"
+    }
   }
 }
 
@@ -13,6 +17,33 @@ provider "azurerm" {
   features {
 
   }
+}
+
+provider "azapi" {
+}
+
+resource "azapi_resource" "scm-policy" {
+  type      = "Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-03-01"
+  name      = "scm"
+  parent_id = azurerm_linux_web_app.webapp.id
+  body = jsonencode({
+    properties = {
+      allow = true
+    }
+    kind = "string"
+  })
+}
+
+resource "azapi_resource" "ftp-policy" {
+  type      = "Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-03-01"
+  name      = "ftp"
+  parent_id = azurerm_linux_web_app.webapp.id
+  body = jsonencode({
+    properties = {
+      allow = true
+    }
+    kind = "string"
+  })
 }
 
 resource "azurerm_resource_group" "rg" {
