@@ -59,6 +59,16 @@ resource "azurerm_service_plan" "plan" {
   sku_name            = "P0v3"
 }
 
+import {
+  id = "/subscriptions/baa4da18-4abd-4ed6-b3ed-1bffa64e4b6b/resourceGroups/myapp-rg/providers/Microsoft.Web/sites/myapp-jonguz-xyz-webapp/basicPublishingCredentialsPolicies/scm"
+  to = azapi_resource.scm-policy
+}
+
+import {
+  id = "/subscriptions/baa4da18-4abd-4ed6-b3ed-1bffa64e4b6b/resourceGroups/myapp-rg/providers/Microsoft.Web/sites/myapp-jonguz-xyz-webapp/basicPublishingCredentialsPolicies/ftp"
+  to = azapi_resource.ftp-policy
+}
+
 resource "azurerm_linux_web_app" "webapp" {
   name                = "myapp-jonguz-xyz-webapp"
   resource_group_name = azurerm_resource_group.rg.name
