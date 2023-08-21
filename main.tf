@@ -36,6 +36,10 @@ resource "azurerm_linux_web_app" "webapp" {
 
   site_config {
   }
+
+  app_settings = {
+    "WEBSITE_WEBDEPLOY_USE_SCM" = "true"
+  }
 }
 
 data "azurerm_dns_zone" "zone" {
@@ -82,4 +86,17 @@ resource "azurerm_app_service_certificate_binding" "cert-binding" {
   hostname_binding_id = azurerm_app_service_custom_hostname_binding.domain.id
   certificate_id      = azurerm_app_service_managed_certificate.cert.id
   ssl_state           = "SniEnabled"
+}
+
+resource "azurerm_app_service_source_control" "example" {
+  app_id   = azurerm_linux_web_app.webapp.id
+  repo_url = "https://github.com/jogule/myapp"
+  branch   = "main"
+
+  github_action_configuration {
+    code_configuration {
+      runtime_stack   = "dotnetcore"
+      runtime_version = "6.0"
+    }
+  }
 }
