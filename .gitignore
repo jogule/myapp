@@ -2,7 +2,7 @@ jonguz.xyz/
 .terraform/
 .terraform.tfstate.lock.info
 terraform.tfstate.backup
-terraform.tfstate
+terraform.tfstate*
 .terraform.lock.hcl
 
 ## Ignore Visual Studio temporary files, build results, and
