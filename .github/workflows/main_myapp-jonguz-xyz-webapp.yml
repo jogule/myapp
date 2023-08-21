@@ -34,6 +34,6 @@ jobs:
       with:
         app-name: myapp-jonguz-xyz-webapp
         slot-name: Production
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_880ECFD879574A9AB67C04234BA586CB }}
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9E37F560A5DF432EB97F11E9D473B15A }}
         package: ${{env.DOTNET_ROOT}}/myapp
 
